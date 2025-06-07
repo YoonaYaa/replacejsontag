@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"reflect"
+	"replacejsontag/test"
 )
 
 type temprature int
@@ -20,6 +21,12 @@ type u struct {
 	o interface{}
 }
 
+type example struct {
+	name   string `json:"name" openapi:nil`
+	Age    int    `openapi:""`
+	height int
+}
+
 func PrintType(i interface{}) {
 	v := reflect.ValueOf(i)
 	t := v.Type()
@@ -28,26 +35,23 @@ func PrintType(i interface{}) {
 }
 
 func main() {
-	v := reflect.ValueOf(u{o{}})
-	fmt.Println(v.FieldByName("o"), v.FieldByName("o").Elem().Kind())
+	e := example{"ja", 1, 12}
+	ex := reflect.ValueOf(e)
+	t := reflect.TypeOf(e)
+	fmt.Println(t)
+	fmt.Println(ex)
+	fmt.Println(ex.Type(), ex.Type().Field(0), ex.Field(0))
 
-	// var q unsafe.Pointer
-	// qv := reflect.ValueOf(q)
-	// fmt.Println(qv, qv.Kind(), qv.Elem())
+	temp, ok := ex.Type().Field(0).Tag.Lookup("openapi")
+	fmt.Println(temp, ok)
 
-	var q *int
-	qv := reflect.ValueOf(q)
-	fmt.Println(qv, qv.Kind(), qv.Elem(), qv.IsValid(), qv.IsZero(), qv.IsNil())
-	if q == nil {
-		fmt.Println("yes")
-	}
+	temp, ok = ex.Type().Field(1).Tag.Lookup("openapi")
+	fmt.Println(temp, ok)
 
-	var i interface{} = (*int)(nil)
-	qv = reflect.ValueOf(i)
-	fmt.Println(qv.IsValid(), qv.Elem().Kind(), qv.IsZero(), qv.IsNil())
+	temp, ok = ex.Type().Field(2).Tag.Lookup("openapi")
+	fmt.Println(temp, ok)
 
-	a := []int{12, 31}
-	pa := &a
-	rpa := reflect.ValueOf(pa)
-	fmt.Println(rpa.IsValid(), rpa.Elem().Kind())
+	fmt.Println(ex.Field(0).Type(), ex.Type().Field(0))
+
+	test.Test()
 }
